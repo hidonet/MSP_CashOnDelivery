@@ -1,5 +1,3 @@
-# THIS MODULE IS NO MORE SUPPORTED
-
 # MSP CashOnDelivery Magento extension
 ==================
 
