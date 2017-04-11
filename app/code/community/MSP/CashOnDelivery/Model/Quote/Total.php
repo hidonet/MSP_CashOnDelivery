@@ -24,6 +24,31 @@ class MSP_CashOnDelivery_Model_Quote_Total extends Mage_Sales_Model_Quote_Addres
 
 	public function collect(Mage_Sales_Model_Quote_Address $address)
 	{
+        $collection = $address->getQuote()->getPaymentsCollection();
+        if ($collection->count() <= 0 || $address->getQuote()->getPayment()->getMethod() == null) {
+            return $this;
+        }
+
+        $paymentMethod = $address->getQuote()->getPayment()->getMethodInstance();
+
+        if ($paymentMethod->getCode() != 'msp_cashondelivery') 
+		{
+			$address->setGrandTotal(0);
+			$address->setBaseGrandTotal(0);
+			$address->setMspCashondelivery(0);
+			$address->setMspBaseCashondelivery(0);
+			$address->setMspCashondeliveryInclTax(0);
+			$address->setMspBaseCashondeliveryInclTax(0);
+
+			$quote = $address->getQuote();
+			$quote->setMspCashondelivery(0);
+			$quote->setMspBaseCashondelivery(0);
+			$quote->setMspCashondeliveryInclTax(0);
+			$quote->setMspBaseCashondeliveryInclTax(0);
+        
+			return $this;
+        }
+
 		$_helper = Mage::helper('msp_cashondelivery');
 		if (!$_helper->getSession()->getQuoteId()) return $this;
 				
@@ -35,10 +60,8 @@ class MSP_CashOnDelivery_Model_Quote_Total extends Mage_Sales_Model_Quote_Addres
 		$baseAmountInclTax = $_model->getBaseExtraFeeInclTax();
 		$amountInclTax = $_model->getExtraFeeInclTax();
 				
-		if (
-		($_helper->getQuote()->getPayment()->getMethod() == $_model->getCode()) &&
-		($address->getAddressType() == Mage_Sales_Model_Quote_Address::TYPE_SHIPPING)
-		) {
+		if ( ($_helper->getQuote()->getPayment()->getMethod() == $_model->getCode()) && ($address->getAddressType() == Mage_Sales_Model_Quote_Address::TYPE_SHIPPING)) 
+		{
 			$address->setGrandTotal($address->getGrandTotal() + $amount);
 			$address->setBaseGrandTotal($address->getBaseGrandTotal() + $baseAmount);
 			
@@ -51,20 +74,21 @@ class MSP_CashOnDelivery_Model_Quote_Total extends Mage_Sales_Model_Quote_Addres
 			$quote->setMspCashondeliveryInclTax($amountInclTax);
 			$quote->setMspBaseCashondeliveryInclTax($baseAmountInclTax);
 		}
-		elseif($_helper->getQuote()->getPayment()->getMethod() != $_model->getCode()) {
-					$address->setGrandTotal(0);
-					$address->setBaseGrandTotal(0);
-		
-					$address->setMspCashondelivery(0);
-					$address->setMspBaseCashondelivery(0);
-					$address->setMspCashondeliveryInclTax(0);
-					$address->setMspBaseCashondeliveryInclTax(0);
-					$quote->setMspCashondelivery(0);
-					$quote->setMspBaseCashondelivery(0);
-					$quote->setMspCashondeliveryInclTax(0);
-					$quote->setMspBaseCashondeliveryInclTax(0);
-		
-				}
+		elseif($_helper->getQuote()->getPayment()->getMethod() != $_model->getCode()) 
+		{
+			$address->setGrandTotal(0);
+			$address->setBaseGrandTotal(0);
+
+			$address->setMspCashondelivery(0);
+			$address->setMspBaseCashondelivery(0);
+			$address->setMspCashondeliveryInclTax(0);
+			$address->setMspBaseCashondeliveryInclTax(0);
+			$quote->setMspCashondelivery(0);
+			$quote->setMspBaseCashondelivery(0);
+			$quote->setMspCashondeliveryInclTax(0);
+			$quote->setMspBaseCashondeliveryInclTax(0);
+
+		}
 
 		return $this;
 	}
